@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ئاهەنگی لەدایکبوونی ڕێسا</title>
+    <style>
+        :root {
+            --glass-bg: rgba(18, 22, 38, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --glass-specular: rgba(255, 255, 255, 0.25);
+            --neon-cyan: #00f2fe;
+            --neon-pink: #ff0844;
+            --neon-purple: #b5179e;
+            --neon-gold: #ffb703;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #060814;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+            position: relative;
+        }
+
+        /* باگراوندی شاز بە گۆی ڕووناکیی نێۆن */
+        .ambient-sphere {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.55;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatSphere 18s ease-in-out infinite alternate;
+        }
+
+        .sphere-1 {
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, #ff0844, #7928ca);
+            top: -80px;
+            right: -80px;
+        }
+
+        .sphere-2 {
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, #00f2fe, #4361ee);
+            bottom: -120px;
+            left: -100px;
+            animation-duration: 22s;
+        }
+
+        .sphere-3 {
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, #b5179e, #7209b7);
+            top: 40%;
+            left: 20%;
+            opacity: 0.35;
+            animation-duration: 15s;
+        }
+
+        @keyframes floatSphere {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -60px) scale(1.15); }
+            100% { transform: translate(-50px, 40px) scale(0.9); }
+        }
+
+        /* تەقینەوەی ئاهەنگ */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* فڕینی دڵ و نۆتەی شووشەیی */
+        .floating-item {
+            position: fixed;
+            bottom: -40px;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            animation: riseUp 7s linear forwards;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4));
+        }
+
+        @keyframes riseUp {
+            0% { transform: translateY(0) rotate(0deg) scale(0.7); opacity: 0; }
+            15% { opacity: 0.8; }
+            85% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) rotate(50deg) scale(1.2); opacity: 0; }
+        }
+
+        /* سندوقی شووشەیی سەرەکی Ultra Glass */
+        .glass-card {
+            position: relative;
+            z-index: 10;
+            background: var(--glass-bg);
+            backdrop-filter: blur(35px) saturate(180%);
+            -webkit-backdrop-filter: blur(35px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-specular);
+            border-radius: 36px;
+            width: 92%;
+            max-width: 530px;
+            padding: 35px 24px;
+            text-align: center;
+            box-shadow: 
+                0 30px 70px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+            animation: glassFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.4s ease;
+        }
+
+        @keyframes glassFadeIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ڕەفەی شووشەیی ناوەوە */
+        .glass-shelf {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 242, 254, 0.12);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            font-weight: bold;
+            margin-bottom: 18px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            line-height: 1.4;
+            background: linear-gradient(135deg, #ffffff 0%, #ff85a2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-size: 1.45rem;
+            line-height: 1.5;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* دوگمەی شووشەیی نێۆن */
+        .glass-btn {
+            background: linear-gradient(135deg, rgba(255, 8, 68, 0.85) 0%, rgba(121, 40, 202, 0.85) 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 16px 24px;
+            border-radius: 50px;
+            font-size: 1.25rem;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            width: 95%;
+            margin: 10px auto;
+            display: block;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 25px rgba(255, 8, 68, 0.35);
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(255, 8, 68, 0.55);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .glass-btn-alt {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-btn-alt:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(0, 242, 254, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.25);
+        }
+
+        .glass-btn-cyan {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.85) 0%, rgba(67, 97, 238, 0.85) 100%);
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.35);
+        }
+
+        .glass-btn-cyan:hover {
+            box-shadow: 0 15px 35px rgba(0, 242, 254, 0.55);
+        }
+
+        /* دوگمەی کۆنتڕۆڵی میوزیک لە گۆشەدا */
+        .music-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 150;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 8px 16px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .music-toggle:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: scale(1.05);
+        }
+
+        /* بەشی قورئان و تەدەبوور */
+        .quran-verse {
+            font-size: 1.65rem;
+            line-height: 1.8;
+            color: var(--neon-gold);
+            text-shadow: 0 0 20px rgba(255, 183, 3, 0.4);
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .tadabbur-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px dashed rgba(255, 183, 3, 0.35);
+            border-radius: 18px;
+            padding: 16px;
+            font-size: 1.2rem;
+            line-height: 1.85;
+            color: #ffffff;
+        }
+
+        /* ئاگاداریی هەڵەی کۆمیدی */
+        .funny-alert {
+            background: rgba(255, 8, 68, 0.88);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            font-size: 1.35rem;
+            font-weight: bold;
+            margin-top: 15px;
+            display: none;
+            animation: shakeAlert 0.4s;
+            box-shadow: 0 10px 30px rgba(255, 8, 68, 0.5);
+        }
+
+        @keyframes shakeAlert {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-12px); }
+            40% { transform: translateX(12px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+
+        /* کایەی یارییەکان */
+        .game-canvas {
+            min-height: 230px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .grid-emojis {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .clickable-emoji {
+            font-size: 3.5rem;
+            cursor: pointer;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 22px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .clickable-emoji:hover {
+            transform: scale(1.18);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.35);
+        }
+
+        .guitar-strings-box {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            height: 140px;
+        }
+
+        .g-string {
+            width: 10px;
+            height: 120px;
+            background: linear-gradient(180deg, #ffffff, #888888);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+
+        .g-string:active {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            transform: scaleY(0.9);
+        }
+
+        .runaway {
+            position: absolute;
+            font-size: 1.25rem;
+            padding: 12px 24px;
+            width: auto;
+            transition: top 0.2s, left 0.2s;
+        }
+
+        .timing-bar-wrap {
+            width: 85%;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 20px 0;
+        }
+
+        .timing-target-zone {
+            position: absolute;
+            left: 45%;
+            width: 18%;
+            height: 100%;
+            background: rgba(0, 242, 254, 0.45);
+            border: 1px solid var(--neon-cyan);
+        }
+
+        .timing-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 100%;
+            background: var(--neon-pink);
+            box-shadow: 0 0 12px var(--neon-pink);
+        }
+
+        .text-input-field {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-cyan);
+            color: white;
+            font-size: 1.8rem;
+            padding: 12px;
+            width: 80%;
+            border-radius: 18px;
+            text-align: center;
+            font-family: inherit;
+            outline: none;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+        }
+
+        /* بەشی دیاریی کۆتایی */
+        .gift-box-glass {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-gold);
+            border-radius: 26px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: left;
+            box-shadow: 0 0 40px rgba(255, 183, 3, 0.25);
+        }
+
+        .gift-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 0;
+        }
+
+        .gift-label { color: #8d99ae; font-size: 1.1rem; }
+        .gift-val { color: var(--neon-cyan); font-size: 1.25rem; font-family: monospace; font-weight: bold; }
+
+        .kiss-headline {
+            font-size: 2.8rem;
+            color: #ff758f;
+            margin-top: 20px;
+            animation: pulseKiss 1.4s infinite;
+        }
+
+        @keyframes pulseKiss {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ڕووناکییەکانی باگراوند -->
+    <div class="ambient-sphere sphere-1" id="sph1"></div>
+    <div class="ambient-sphere sphere-2" id="sph2"></div>
+    <div class="ambient-sphere sphere-3" id="sph3"></div>
+
+    <!-- کانڤاسی تەقینەوەی ئاهەنگ -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- کۆنتڕۆڵی میوزیک -->
+    <div class="music-toggle" id="mToggle" onclick="toggleAudio()">
+        <span>🎵</span>
+        <span id="mState">داگیرساوە</span>
+    </div>
+
+    <!-- ئۆدیۆی گۆرانی لەدایکبوون -->
+    <audio id="bgm" src="https://assets.mixkit.co/music/preview/mixkit-happy-birthday-to-you-beat-574.mp3" loop preload="auto"></audio>
+
+    <!-- سندوقی شووشەیی سەرەکی -->
+    <div class="glass-card" id="app">
+        <div class="badge-pill">ئاهەنگی لەدایکبوونی سووپرایز 🎉</div>
+        <div class="glass-shelf">
+            <h1>ڕێسا حەسەن ڕەشید</h1>
+            <h2 style="color: var(--neon-cyan); margin-top: 10px;">شازترین گیتارژەن و یاریزانی ڕەینبۆ</h2>
+        </div>
+        <p style="margin-bottom: 25px;">تەمەنی حەڤدە ساڵیت پیرۆز بێت کاکە ڕێسا هیوای سەرکەوتنی گەورەت بۆ دەخوازم لە ژیانتدا سی قۆناغی شاز ببڕە بۆ وەرگرتنی دیارییەکە</p>
+        <button class="glass-btn" onclick="startExperience()">دەستپێکردنی گۆرانی و ئاهەنگەکە 🚀</button>
+    </div>
+
+    <script>
+        // زانیاریی ئایەت و تەدەبوور بێ هیچ نیشانەیەکی خاڵبەندی
+        const quranStations = [
+            {
+                verse: "إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ",
+                tadabbur: "تەدەبوور لەم ئایەتە ئەوەمان پێ دەڵێت کە پەیوەندی باوەڕداران برایەتی ڕاستەقینەیە نەک بەرژەوەندی کاتی چونکە برای ڕاستەقینە لە ناخۆشیدا وەک قەڵغان و لە خۆشیدا وەک باڵ پشتیوانت دەبێت"
+            },
+            {
+                verse: "الْأَخِلَّاءُ يَوْمَئِذٍ بَعْضُهُمْ لِبَعْضٍ عَدُوٌّ إِلَّا الْمُتَّقِينَ",
+                tadabbur: "تەدەبوور لێرەدا دەریدەخات کە هەموو هاوڕێیەتییەک کە لەسەر دنیا بێت ڕۆژێک دادێت دەبێتە دوژمنایەتی تەنها ئەو برایەتییە نەبێت کە لەسەر چاکە و پێناو خودا بێت کە تا بەهەشت بەردەوام دەبێت"
+            },
+            {
+                verse: "وَاعْتَصِمُوا بِحَبْلِ اللَّهِ جَمِيعًا وَلَا تَفَرَّقُوا",
+                tadabbur: "تەدەبوور پێمان دەڵێت هێزی مرۆڤ لە برایەتی و تەباییدایە و مرۆڤ بە تەنهایی زوو تووشی شکان دەبێت بەڵام هاوڕێی باوەڕدار و دڵسۆز دەست لەناو دەستی یەکتر دەگرن و هەرگیز جیا نابنەوە"
+            },
+            {
+                verse: "وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَى",
+                tadabbur: "تەدەبوور لەم ئایەتە جەخت دەکاتەوە کە جوانی ژیان لە هاوکاریکردندایە بۆ چاکەکاری برای چاک و دڵسۆز ئەو کەسەیە کە لە هەر هەنگاوێکدا بۆ بەرەوپێشچوون هاوکاریت دەکات"
+            },
+            {
+                verse: "وَاخْفِضْ جَنَاحَكَ لِمَنِ اتَّبَعَكَ مِنَ الْمُؤْمِنِينَ",
+                tadabbur: "تەدەبوور لێرەدا فێرمان دەکات کە باڵی میهرەبانی و خۆشەویستی بۆ برایانی خۆت بکەیتەوە چونکە گەورەیی مرۆڤ لە پاکی دڵ و وەفاداری بۆ هاوڕێکانیدایە"
+            }
+        ];
+
+        // ١٥ پرسیاری کۆمیدی
+        const questions = [
+            {
+                q: "ئایە حەمە مۆتەت خۆشدەوێ",
+                options: ["بەڵێ زۆرم خۆشدەوێ", "نەخێر"],
+                correct: 0,
+                wrongMsg: "حەدتت چیە دەی خێرا بەڵێ داگرە 🤨"
+            },
+            {
+                q: "دۆک لە یاری ڕەینبۆ سیکس چەند ستیمی هێیە",
+                options: ["سێ ستیم", "سفر ستیم", "پەنجا ستیم"],
+                correct: 0,
+                wrongMsg: "وەڵا دیارە کلاود پلەی دەکەیت بە سێ ستیمەوە هەمووان هەڵدەسێنێتەوە"
+            },
+            {
+                q: "ئایە کەید سیفۆری پێیە",
+                options: ["بەڵێ پێیەتی", "نەخێر پێی نییە", "نازانم بەخوا"],
+                correct: 0,
+                wrongMsg: "ئەی هاوار دیارە نازانی کەید سیفۆرەکەی دەخاتە سەر دەرگا و پێتدا دەتەقێتەوە"
+            },
+            {
+                q: "کارئەکتەری دڵخوازی حەمە مۆتە کێیە لە ڕەینبۆ",
+                options: ["کاڵێ", "ئاش", "مامە ڤاندام"],
+                correct: 0,
+                wrongMsg: "مامە ڤاندام کەی لە ڕەینبۆ بووە بڕۆ کاڵێ هەڵبژێرە قۆشمە"
+            },
+            {
+                q: "کێ لە ڕەینبۆ بەردەوام هێڵەکەی دادەنێ و لێی دەخەوێ",
+                options: ["ڕێسا", "کاپیتاو", "فیوز"],
+                correct: 0,
+                wrongMsg: "خۆت مەکە بە بێتاوان هەمیشە لە گۆشەیەکدا ڕادەمێنیت و ڕاودەکرێیت"
+            },
+            {
+                q: "ئامێری گیتاری کلاسیک چەند تەلی هەیە",
+                options: ["شەش تەل", "هەشت تەل", "دوانزە تەل"],
+                correct: 0,
+                wrongMsg: "گیتارژەنی سەدەیت و نەزانی شەش تەلی هەیە ئابڕووت چوو"
+            },
+            {
+                q: "ئەگەر لە ڕەینبۆ کلۆچت بۆ نەمێنێت تۆ چی دەکەیت",
+                options: ["کلاود دەکەم و هەموویان دەکوژم", "یارییەکە دادەخەم", "دەست دەکەم بە گریان"],
+                correct: 0,
+                wrongMsg: "دەست مەکە بە گریان پیاو بە فیشەکێ بنێ پێیانەوە ڕامەکە"
+            },
+            {
+                q: "ڕێسا حەسەن ڕەشید گیتارژەنە یان بەیسژەن",
+                options: ["گیتارژەنی لێهاتوو", "بەیسژەن", "هیچیان نازانێت"],
+                correct: 0,
+                wrongMsg: "کەرە گیان ناوت گیتارژەنە کەی بوویتە هیچیان خۆت بناسە"
+            },
+            {
+                q: "کێ لە سێرڤەر بەردەوام فلاش دەخوات بە هەڵە",
+                options: ["ڕێسا", "دوژمن", "کەس"],
+                correct: 0,
+                wrongMsg: "هەموو جارێک یەک فلاش دەخۆیت و شاشەکەت دەبێتە بەفری کوێستان"
+            },
+            {
+                q: "گیتاری کارەبایی دەنگی بە چی گەورە دەبێت",
+                options: ["ئەمپلیفایەر", "مایکرۆفۆنی دەستی", "بە فیزیکی ئاسایی"],
+                correct: 0,
+                wrongMsg: "بەبێ ئەمپلیفایەر تەنها دەنگی خشەخش دێت خۆت تێبگەیەنە"
+            },
+            {
+                q: "باشترین ئۆپەرەیتەری هێرشبەر لە ڕەینبۆ کێیە",
+                options: ["ئاش", "سوپەرمان", "مام برایم"],
+                correct: 0,
+                wrongMsg: "سوپەرمان کەی لە ڕەینبۆ دانراوە ئاش هەڵبژێرە سەرمان مەیەشێنە"
+            },
+            {
+                q: "ئەگەر تەلی گیتارەکەت بپچڕێت چی دەکەیت",
+                options: ["تەلێکی نوێی تێدەخەم", "گیتارەکە دەشکێنم", "هاوار دەکەم"],
+                correct: 0,
+                wrongMsg: "مەیڕمێنە گوناحە پارەت پێداوە تەلێکی نوێی تێخە بێ قسە"
+            },
+            {
+                q: "کێ ئەم کۆدە ناوازەیەی بۆ ئامادە کردوویت",
+                options: ["برا و هاوڕێت حەمە مۆتە", "کۆمپانیای ناسا", "دراوسێکانتان"],
+                correct: 0,
+                wrongMsg: "ناسا کاری چییە بەسەر تۆوە ئەوە ماندووبوونی حەمە مۆتەی براتە"
+            },
+            {
+                q: "ئەمڕۆ لە هەموو ڕۆژەکانی تر چ جیاوازییەکی هەیە",
+                options: ["ڕۆژی لەدایکبوونی ڕێسایە", "ڕۆژێکی تەواو ئاساییە", "جەژنی نەورۆزە"],
+                correct: 0,
+                wrongMsg: "ڕۆژی لەدایکبوونی خۆتە گەوج گیان چۆن لەبیرت چوو"
+            },
+            {
+                q: "پایتەختی یاریزانە گیتارژەنەکان کوێیە",
+                options: ["ژوورەکەی ڕێسا", "لەندەن", "تۆکیۆ"],
+                correct: 0,
+                wrongMsg: "وەڵا ژوورەکەی ڕێسا پایتەختی ڕاستەقینەی گیتار و ڕەینبۆیە"
+            }
+        ];
+
+        // ١٥ یاریی شاز
+        const games = [
+            { type: 'clicker', goal: 7, title: "حەوت جار زۆر خێرا لە گیتارەکە بدە" },
+            { type: 'timing', title: "نیشانەکە ڕێک لەسەر ناوچەی سەوز بوەستێنە" },
+            { type: 'strings', target: 3, title: "پەنجە لە تەلی سێیەمی گیتارەکە بدە" },
+            { type: 'catch', speed: 600, title: "دوگمەی گیتارە ڕاکردووەکە بگرە" },
+            { type: 'odd', e: ['🎸','🎸','🎻','🎸','🎸'], c: 2, title: "جیاوازەکە بدۆزەرەوە لە نێوانیاندا" },
+            { type: 'slider', title: "ڕاکێشە بۆ سەدا سەد تا دۆک ستیمەکە لێبدات" },
+            { type: 'rps', title: "کۆمپیوتەر لە بەرد کاغەز مقەست ببەرەوە" },
+            { type: 'type', word: "گیتار", title: "وشەی گیتار بنووسە بەبێ هەڵە" },
+            { type: 'defuse', title: "تەلی سیفۆری بۆمبەکە ببڕە پێش تەقینەوە" },
+            { type: 'color', title: "تەنها کە بوو بە ڕەنگی سەوز پەنجەی لێ بدە" },
+            { type: 'clicker', goal: 12, title: "دوانزە جار لە تەلەکە بدە زۆر بە خێرایی" },
+            { type: 'odd', e: ['🎶','🎶','🎵','🎶'], c: 2, title: "کامیان نۆتەی تاکی جیاوازە" },
+            { type: 'type', word: "ڕێسا", title: "ناوی خۆت بنووسە بە شانازییەوە" },
+            { type: 'catch', speed: 450, title: "درۆنەکەی ڕەینبۆ زۆر خێراترە بیگرە ئەگەر دەتوانیت" },
+            { type: 'type', word: "17", title: "تەمەنی نوێت چەندە بە ژمارە بۆ کردنەوەی قوفڵەکە" }
+        ];
+
+        // دروستکردنی زنجیرەی قۆناغەکان
+        let timeline = [];
+        for(let i=0; i<15; i++) {
+            timeline.push({ type: 'question', data: questions[i] });
+            timeline.push({ type: 'game', data: games[i] });
+        }
+
+        let fullSteps = [];
+        let qCount = 0;
+        for(let i=0; i<30; i++) {
+            fullSteps.push(timeline[i]);
+            if((i + 1) % 6 === 0 && qCount < 5) {
+                fullSteps.push({ type: 'quran', data: quranStations[qCount] });
+                qCount++;
+            }
+        }
+
+        let currentStepIndex = 0;
+        let gameTimer = null;
+        let timingBarTimer = null;
+        const app = document.getElementById('app');
+        const bgm = document.getElementById('bgm');
+
+        // سیستەمی یەدەگی میوزیک بە Web Audio بۆ ئەوەی هەرگیز بێدەنگ نەبێت
+        let audioCtx = null;
+        function playChimeNote(freq, start, duration) {
+            try {
+                if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime + start);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + start + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + start);
+                osc.stop(audioCtx.currentTime + start + duration);
+            } catch(e){}
+        }
+
+        function playBirthdayMelodyFallback() {
+            // Happy Birthday melody notes: G4 G4 A4 G4 C5 B4 ...
+            const notes = [
+                {f: 261.6, d: 0.3, p: 0.0}, {f: 261.6, d: 0.3, p: 0.4}, {f: 293.6, d: 0.6, p: 0.8},
+                {f: 261.6, d: 0.6, p: 1.5}, {f: 349.2, d: 0.6, p: 2.2}, {f: 329.6, d: 1.0, p: 2.9}
+            ];
+            notes.forEach(n => playChimeNote(n.f, n.p, n.d));
+        }
+
+        function toggleAudio() {
+            const stateSpan = document.getElementById('mState');
+            if(bgm.paused) {
+                bgm.play().then(() => {
+                    stateSpan.innerText = 'داگیرساوە';
+                }).catch(() => {
+                    playBirthdayMelodyFallback();
+                    stateSpan.innerText = 'دەنگی نۆتە';
+                });
+            } else {
+                bgm.pause();
+                stateSpan.innerText = 'کوژاوەتەوە';
+            }
+        }
+
+        // فڕینی بەردەوامی دڵ و ئەستێرە لە باگراوند
+        function spawnFloatingItems() {
+            const icons = ['✨', '💖', '🎸', '🎵', '🎈'];
+            setInterval(() => {
+                const el = document.createElement('div');
+                el.className = 'floating-item';
+                el.innerText = icons[Math.floor(Math.random() * icons.length)];
+                el.style.left = Math.random() * 92 + 'vw';
+                el.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 8000);
+            }, 700);
+        }
+        spawnFloatingItems();
+
+        // کانڤاسی تەقینەوەی ئاهەنگ
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function triggerConfettiBurst(count = 60) {
+            const colors = ['#00f2fe', '#ff0844', '#b5179e', '#ffb703', '#ffffff'];
+            const specialEmojis = ['🎉', '🎸', '💖', '✨'];
+            for(let i=0; i<count; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 18,
+                    vy: (Math.random() - 0.7) * 20,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    emoji: Math.random() > 0.65 ? specialEmojis[Math.floor(Math.random() * specialEmojis.length)] : null,
+                    rotation: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 12,
+                    alpha: 1
+                });
+            }
+        }
+
+        function renderConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for(let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.45;
+                p.rotation += p.vRot;
+                p.alpha -= 0.015;
+
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, p.alpha);
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+
+                if(p.emoji) {
+                    ctx.font = '22px Arial';
+                    ctx.fillText(p.emoji, -11, 11);
+                } else {
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                }
+                ctx.restore();
+
+                if(p.alpha <= 0 || p.y > canvas.height) {
+                    particles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(renderConfetti);
+        }
+        renderConfetti();
+
+        function startExperience() {
+            bgm.play().catch(() => {
+                playBirthdayMelodyFallback();
+            });
+            triggerConfettiBurst(60);
+            render();
+        }
+
+        function triggerError(msg) {
+            let oldAlert = document.getElementById('active-error');
+            if(oldAlert) oldAlert.remove();
+
+            let err = document.createElement('div');
+            err.id = 'active-error';
+            err.className = 'funny-alert';
+            err.innerText = msg;
+            err.style.display = 'block';
+            app.appendChild(err);
+
+            setTimeout(() => {
+                if(document.getElementById('active-error')) {
+                    document.getElementById('active-error').remove();
+                }
+            }, 2500);
+        }
+
+        function advance() {
+            clearInterval(gameTimer);
+            clearInterval(timingBarTimer);
+            let oldAlert = document.getElementById('active-error');
+            if(oldAlert) oldAlert.remove();
+
+            triggerConfettiBurst(45);
+            playChimeNote(523.25, 0, 0.4); // C5 victory chime
+
+            currentStepIndex++;
+
+            // جێگۆڕکێی گۆیە ڕەنگاوڕەنگەکان لە باگراوند
+            const hues = [0, 45, 90, 150, 210, 270, 310];
+            let h = hues[currentStepIndex % hues.length];
+            document.getElementById('sph1').style.filter = `hue-rotate(${h}deg) blur(90px)`;
+            document.getElementById('sph2').style.filter = `hue-rotate(${-h}deg) blur(90px)`;
+
+            if(currentStepIndex >= fullSteps.length) {
+                showFinalCelebration();
+            } else {
+                render();
+            }
+        }
+
+        function render() {
+            let step = fullSteps[currentStepIndex];
+
+            if(step.type === 'quran') {
+                app.innerHTML = `
+                    <div class="badge-pill" style="color:var(--neon-gold); border-color:var(--neon-gold);">ئایەتی قورئان و تەدەبوور 🌟</div>
+                    <div class="glass-shelf" style="border-color: rgba(255, 183, 3, 0.35);">
+                        <div class="quran-verse">${step.data.verse}</div>
+                        <div class="tadabbur-box">${step.data.tadabbur}</div>
+                    </div>
+                    <button class="glass-btn glass-btn-cyan" onclick="advance()">بەردەوام بە بۆ قۆناغی داهاتوو 🌟</button>
+                `;
+                return;
+            }
+
+            let stageNumber = currentStepIndex + 1;
+            let html = `<div class="badge-pill">قۆناغی ${stageNumber} لە ${fullSteps.length}</div>`;
+
+            if(step.type === 'question') {
+                let q = step.data;
+                html += `
+                    <div class="glass-shelf">
+                        <h2>${q.q}</h2>
+                    </div>
+                    <div>
+                `;
+                q.options.forEach((opt, idx) => {
+                    let btnClass = (idx === 0) ? 'glass-btn' : 'glass-btn glass-btn-alt';
+                    html += `<button class="${btnClass}" onclick="checkQuestionAnswer(${idx}, ${q.correct}, '${q.wrongMsg}')">${opt}</button>`;
+                });
+                html += `</div>`;
+                app.innerHTML = html;
+            } else if(step.type === 'game') {
+                let g = step.data;
+                html += `
+                    <div class="glass-shelf" style="border-color: rgba(0, 242, 254, 0.35);">
+                        <h2 style="color: var(--neon-cyan);">${g.title}</h2>
+                    </div>
+                    <div id="game-container" class="game-canvas"></div>
+                `;
+                app.innerHTML = html;
+                setTimeout(() => launchMiniGame(g), 50);
+            }
+        }
+
+        window.checkQuestionAnswer = function(chosen, correct, wrongMsg) {
+            if(chosen === correct) {
+                advance();
+            } else {
+                triggerError(wrongMsg);
+            }
+        };
+
+        function launchMiniGame(g) {
+            let box = document.getElementById('game-container');
+
+            if(g.type === 'clicker') {
+                let count = 0;
+                box.innerHTML = `<div class="clickable-emoji" id="strumBtn" style="font-size: 5rem;">🎸</div>`;
+                document.getElementById('strumBtn').onclick = function() {
+                    count++;
+                    this.style.transform = `scale(${1 + count * 0.08})`;
+                    playChimeNote(330 + count * 35, 0, 0.15);
+                    if(count >= g.goal) advance();
+                };
+            }
+            else if(g.type === 'timing') {
+                box.innerHTML = `
+                    <div class="timing-bar-wrap">
+                        <div class="timing-target-zone"></div>
+                        <div class="timing-indicator" id="tIndicator"></div>
+                    </div>
+                    <button class="glass-btn glass-btn-cyan" style="width: auto; padding: 10px 30px;" id="stopTimingBtn">بوەستە 🎯</button>
+                `;
+                let ind = document.getElementById('tIndicator');
+                let pos = 0;
+                let direction = 1;
+                timingBarTimer = setInterval(() => {
+                    pos += direction * 3.5;
+                    if(pos > 95 || pos < 0) direction *= -1;
+                    ind.style.left = pos + '%';
+                }, 20);
+
+                document.getElementById('stopTimingBtn').onclick = function() {
+                    if(pos >= 43 && pos <= 65) {
+                        advance();
+                    } else {
+                        triggerError("نەگەیشتە ناوچەی سەوز خێراتر یان هێواشتر بوەستە");
+                    }
+                };
+            }
+            else if(g.type === 'strings') {
+                let sHtml = `<div class="guitar-strings-box">`;
+                for(let i=1; i<=6; i++) {
+                    sHtml += `<div class="g-string" onclick="checkString(${i}, ${g.target})"></div>`;
+                }
+                sHtml += `</div><p style="margin-top:15px; color:#aaa;">لە ڕاستەوە بۆ چەپ بژمێرە</p>`;
+                box.innerHTML = sHtml;
+            }
+            else if(g.type === 'odd') {
+                let oHtml = `<div class="grid-emojis">`;
+                g.e.forEach((emoji, idx) => {
+                    oHtml += `<div class="clickable-emoji" onclick="checkOddMatch(${idx}, ${g.c})">${emoji}</div>`;
+                });
+                oHtml += `</div>`;
+                box.innerHTML = oHtml;
+            }
+            else if(g.type === 'catch') {
+                box.innerHTML = `<button class="glass-btn runaway" id="catchTarget">بمگرە 🎯</button>`;
+                let b = document.getElementById('catchTarget');
+                b.onclick = advance;
+                gameTimer = setInterval(() => {
+                    b.style.top = Math.random() * 65 + 10 + '%';
+                    b.style.left = Math.random() * 65 + 10 + '%';
+                }, g.speed);
+            }
+            else if(g.type === 'slider') {
+                box.innerHTML = `
+                    <input type="range" min="0" max="100" value="0" style="width:85%; accent-color:var(--neon-cyan); height:12px; cursor:pointer;" id="sliderBar">
+                    <h3 id="sliderVal" style="margin-top: 15px; color:var(--neon-cyan);">0%</h3>
+                `;
+                let s = document.getElementById('sliderBar');
+                s.oninput = function() {
+                    document.getElementById('sliderVal').innerText = this.value + '%';
+                    if(this.value == 100) advance();
+                };
+            }
+            else if(g.type === 'rps') {
+                box.innerHTML = `
+                    <div class="grid-emojis">
+                        <div class="clickable-emoji" onclick="playRpsGame()">🪨</div>
+                        <div class="clickable-emoji" onclick="playRpsGame()">📄</div>
+                        <div class="clickable-emoji" onclick="playRpsGame()">✂️</div>
+                    </div>
+                `;
+            }
+            else if(g.type === 'type') {
+                box.innerHTML = `
+                    <input type="text" class="text-input-field" id="gameInput">
+                    <button class="glass-btn glass-btn-cyan" onclick="validateTextInput('${g.word}')">پشکنین</button>
+                `;
+            }
+            else if(g.type === 'color') {
+                box.innerHTML = `<div id="colorTapBox" style="width:130px; height:130px; border-radius:28px; border:2px solid white; cursor:pointer; backdrop-filter:blur(10px);"></div>`;
+                let cBox = document.getElementById('colorTapBox');
+                let colors = ['#e61432', '#0070f3', '#f5a623', '#7928ca', '#00dfd8'];
+                let cIndex = 0;
+                cBox.onclick = function() {
+                    if(colors[cIndex] === '#00dfd8') advance();
+                    else triggerError("ئەوە ڕەنگی سەوزی ئاوی نەبوو هەڵەیە");
+                };
+                gameTimer = setInterval(() => {
+                    cIndex = (cIndex + 1) % colors.length;
+                    cBox.style.backgroundColor = colors[cIndex];
+                    cBox.style.boxShadow = `0 0 35px ${colors[cIndex]}`;
+                }, 480);
+            }
+            else if(g.type === 'defuse') {
+                box.innerHTML = `
+                    <div style="font-size:3.5rem; margin-bottom:15px; filter:drop-shadow(0 0 15px red);">💣</div>
+                    <div class="grid-emojis">
+                        <button class="glass-btn" style="background:rgba(230,20,50,0.85); width:auto; padding:10px 24px;" onclick="triggerError('تەلی سوور بۆمبەکەی تەقاندەوە ئاگادار بە')">تەلی سوور</button>
+                        <button class="glass-btn glass-btn-cyan" style="width:auto; padding:10px 24px;" onclick="advance()">تەلی شین</button>
+                    </div>
+                `;
+            }
+        }
+
+        window.checkString = function(clicked, target) {
+            playChimeNote(220 + clicked * 50, 0, 0.3);
+            if(clicked === target) advance();
+            else triggerError("ئەوە تەلی هەڵە بوو دەنگی گیتارەکەت تێکچوو");
+        };
+
+        window.checkOddMatch = function(clicked, correct) {
+            if(clicked === correct) advance();
+            else triggerError("ئەوە جیاوازەکە نەبوو چاوت کراوەتر بکە");
+        };
+
+        window.playRpsGame = function() {
+            if(Math.random() > 0.45) advance();
+            else triggerError("کۆمپیوتەر بردیەوە خێرا جارێکی تر تاقی بکەرەوە");
+        };
+
+        window.validateTextInput = function(expected) {
+            let val = document.getElementById('gameInput').value.trim();
+            if(val === expected || val === "١٧") advance();
+            else triggerError("نووسینەکە هەڵەیە بە وردی بینوسە");
+        };
+
+        function showFinalCelebration() {
+            // تەقینەوەی بەردەوامی ئاهەنگ
+            for(let i=0; i<6; i++) {
+                setTimeout(() => triggerConfettiBurst(90), i * 350);
+            }
+
+            app.innerHTML = `
+                <div class="badge-pill" style="color:var(--neon-gold); border-color:var(--neon-gold);">پیرۆزبایی کۆتایی 🎉 تەدااا</div>
+                <div class="glass-shelf">
+                    <h1 style="font-size:2.3rem;">تەمەنت درێژ بێت ڕێسا گیان</h1>
+                    <p style="margin-top:15px; font-size:1.25rem; line-height:1.8;">بەهیوای ئەوەی هەمیشە پەنجەکانت لەسەر گیتار بێت و خۆشترین ئاوازەکان بژەنیت و لە یاری و لە ژیاندا هەمیشە سەرکەوتوو و بەختیار بیت برای دڵسۆزم</p>
+                </div>
+
+                <div class="gift-box-glass">
+                    <h3 style="color:var(--neon-cyan); text-align:center; font-size:1.5rem; margin-top:0;">گەیمپاسێکی دوو مانگی ئەڵتیمەیت</h3>
+                    <div class="gift-row">
+                        <span class="gift-label">ئیمێڵ</span>
+                        <span class="gift-val">fyt9674gp98bl@outlook.com</span>
+                    </div>
+                    <div class="gift-row" style="border-bottom:none; padding-bottom:0;">
+                        <span class="gift-label">پاسوەرد</span>
+                        <span class="gift-val">2211caca</span>
+                    </div>
+                </div>
+
+                <div class="kiss-headline">خارە قلێکی بدە ئەمەش 😗</div>
+            `;
+        }
+    </script>
+</body>
+</html>
